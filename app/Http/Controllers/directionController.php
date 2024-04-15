@@ -20,7 +20,7 @@ class directionController extends Controller
         $streams = DB::table('streams') 
         -> get();
         $profiles = DB::table('profiles') -> get();
-        dump($profiles);
+        dump($faculties);
         return view('laravel', ['faculties' => $faculties, 'streams' => $streams, 'profiles' => $profiles]);
         //@if ($stream -> profile_id == $profile -> id) @if ($faculty -> id == $profile -> faculty_id)
     }
