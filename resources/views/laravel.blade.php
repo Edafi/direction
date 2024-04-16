@@ -36,12 +36,14 @@
                 @foreach($streams as $stream)
                   @if ($stream->profile_id == $profile->id && strpos($stream->name, "б") && (date("Y") - $stream->year_in < 5 and date("Y") - $stream->year_in > 0) && $stream->full_name != '' && $form=="Бакалавриат")
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
-                      <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="tab{{ $stream->id }}-tab" data-bs-toggle="tab" data-bs-target="#tab{{ $stream->id }}"
-                          type="button" role="tab" aria-controls="home" aria-selected="true">Скрыть</button>
-                      </li>
                       @foreach($groups as $gr)
                         @if ($gr->stream_id == $stream->id && $stream->full_name != '' )
+                          @if($gr->group_number == 1)
+                            <li class="nav-item" role="presentation">
+                              <button class="nav-link active" id="tab{{ $stream->id }}-tab" data-bs-toggle="tab" data-bs-target="#tab{{ $stream->id }}"
+                                type="button" role="tab" aria-controls="home" aria-selected="true">Скрыть</button>
+                            </li>
+                          @endif
                           <li class="nav-item" role="presentation">
                             <button class="nav-link" id="tab{{ $gr->id }}-tab" data-bs-toggle="tab" data-bs-target="#tab{{ $gr->id }}"
                             type="button" role="tab" aria-controls="home" aria-selected="true">{{ $stream->name }}-{{ $gr->group_number }}</button>
