@@ -5,190 +5,222 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-.accordion {
-  background-color: #eee;
-  color: #444;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  border: none;
-  text-align: left;
-  outline: none;
-  font-size: 15px;
-  transition: 0.4s;
-}
-
-.active, .accordion:hover {
-  background-color: #ccc;
-}
-
-.accordion:after {
-  content: '\002B';
-  color: #777;
-  font-weight: bold;
-  float: right;
-  margin-left: 5px;
-}
-
-.active:after {
-  content: "\2212";
-}
-
-.panel {
-  padding: 0 18px;
-  background-color: white;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.2s ease-out;
-}
 </style>
 </head>
 <body>
 
-
-
-
-<div class="accordion" id="accordionExample">
+<form class="d-flex justify-content-end mb-2">
+	<button name="upload_teacher" class="btn btn-warning">Загрузить нагрузку преподавателей</button>
+</form>
+<div class="accordion accordion-flush" id="accordionFlushExample">
   @foreach ($faculties as $faculty)
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faculty{{$faculty->id}}" aria-expanded="false" aria-controls="faculty{{$faculty->id}}">
-          Бакалавр
-        </button>
-      </h2>
-      <div id="faculty{{$faculty->id}}" class="accordion-collapse collapse" aria-labelledby="heading{{$faculty->id}}" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          @foreach ($profiles as $profile)
-            @if ($faculty->id == $profile->faculty_id)
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="heading{{$profile->id}}">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#profile{{$profile->id}}" aria-expanded="false" aria-controls="profile{{$profile->id}}">
-                    {{$profile->name}}
-                  </button>
-                </h2>
-                <div id="profile{{$profile->id}}" class="accordion-collapse collapse" aria-labelledby="heading{{$profile->id}}" data-bs-parent="#faculty{{$faculty->id}}">
-                  <div class="accordion-body">
-                    @foreach($streams as $stream)
-                      @if ($stream->profile_id == $profile->id && strpos($stream->name, "б") && (date("Y") - $stream->year < 5 && date("Y") - $stream->year > 0) && $stream->full_name != '')
-                        <div class="accordion-item">
-                          <h2 class="accordion-header" id="heading{{$stream->id}}">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#stream{{$stream->id}}" aria-expanded="false" aria-controls="stream{{$stream->id}}">  
-                                {{$stream->name}}
-                            </button>
-                          </h2>
-                          <div id="stream{{$stream->id}}" class="accordion-collapse collapse" aria-labelledby="heading{{$stream->id}}" data-bs-parent="#profile{{$profile->id}}">
-                            <div class="accordion-body">
-                              <strong>This is the accordion body for stream {{$stream->name}}</strong>
-                            </div>
-                          </div>
-                        </div>
+  <h2>{{$faculty->name}}</h2>
+    @foreach($formEducation as $form)
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{ $form }}{{ $faculty->id }}">
+          <button class="accordion-button collapsed" type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapse{{ $form }}{{ $faculty->id }}"
+                  aria-expanded="false"
+                  aria-controls="collapse{{ $form }}{{ $faculty->id }}">
+            {{ $form}}
+          </button>
+        </h2>
+        <div id="collapse{{ $form }}{{ $faculty->id }}"
+            class="accordion-collapse collapse"
+            aria-labelledby="heading{{ $form }}{{ $faculty->id }}"
+            data-bs-parent="#accordionFormat{{ $faculty->id }}">
+          <div class="accordion-body">
+            @foreach ($profiles as $profile)
+              @if ($faculty->id == $profile->faculty_id)
+                @foreach($streams as $stream)
+                  @if ($stream->profile_id == $profile->id && strpos($stream->name, "б") && (date("Y") - $stream->year_in < 5 and date("Y") - $stream->year_in > 0) && $stream->full_name != '' && $form=="Бакалавриат")
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab{{ $stream->id }}-tab" data-bs-toggle="tab" data-bs-target="#tab{{ $stream->id }}"
+                          type="button" role="tab" aria-controls="home" aria-selected="true">Скрыть</button>
+                      </li>
+                      @foreach($groups as $gr)
+                        @if ($gr->stream_id == $stream->id && $stream->full_name != '' )
+                          <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tab{{ $gr->id }}-tab" data-bs-toggle="tab" data-bs-target="#tab{{ $gr->id }}"
+                            type="button" role="tab" aria-controls="home" aria-selected="true">{{ $stream->name }}-{{ $gr->group_number }}</button>
+                          </li>
+                        @endif
+                      @endforeach
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                      <div class="tab-pane fade show" id="tab{{ $stream->id }}" role="tabpanel" aria-labelledby="tab{{ $stream->id }}-tab">
+
+                      </div>
+                    @foreach($groups as $gr)
+                    @if ($gr->stream_id == $stream->id && $stream->full_name != '')
+                      <div class="tab-pane fade show" id="tab{{ $gr->id }}" role="tabpanel" aria-labelledby="tab{{ $gr->id }}-tab">
+                        <!---->
+
+                        <body>
+                          <table class="table">
+                            <thead>
+                              <tr class="tr">
+                                <th class="th" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;">ФИО Студента  </th>
+                                <th class="th" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;">Руководитель</th>
+                                <th class="th" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;">Статус</th>
+                              </tr>
+                            </thead>
+                        <tbody>
+                          @foreach($students as $student)
+                            @if($gr->id == $student->group_id)
+                              @foreach($student_practic as $studPrac)
+                                @if ($student->id == $studPrac->student_id) <!--Условие для отбора студентов практики по группам-->
+                                  <tr class="tr">
+                                    <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">{{ $student->fio}}</strong></td>
+                                    @if(!$studPrac->teacher_id)
+                                      <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">-</strong></td>
+                                    @else
+                                      <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">
+                                        @foreach ($teacher_score as $teacherScore)
+                                          @if($teacherScore->id == $studPrac->teacher_id)
+                                            @foreach($teachers as $teacher)
+                                              @if($teacher->id == $teacherScore->teacher_id)
+                                                {{$teacher->fio}} </strong></td>
+                                              @endif
+                                            @endforeach
+                                          @endif
+                                        @endforeach
+                                    @endif
+                                    @switch($studPrac->status)
+                                      @case(0)
+                                        <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">Обрабатывается</strong></td>
+                                        @break
+                                      @case(1)
+                                        <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">Принят</strong></td>
+                                        @break
+                                      @case(2)
+                                        <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">Не принят</strong></td>
+                                        @break
+                                    @endswitch
+                                  </tr>
+                                @endif
+                              @endforeach
+                              <tr class="tr">
+                                  <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">{{ $student->fio}}</strong></td>
+                                  <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">-</strong></td>
+                                  <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">-</strong></td>
+                                </tr>
+                            @endif
+                          @endforeach
+                        </tbody>
+                      </table>
+                    </body>
+
+                        <!---->
+                        <form class="d-flex justify-content-end">
+                          <button name="download" value="{{ $gr->id }}" class="btn btn-primary" href="/sotrudniku/praktika/direktsiya/download.php?groupName={{ $stream->name }}-{{ $gr->group_number }}&groupID={{ $gr->id }}" role="button">Сформировать шаблон приказ</button>
+                        </form>
+                        <!---->
+
+                      </div>
                       @endif
                     @endforeach
-                  </div>
-                </div>
-              </div>
-            @endif
-          @endforeach
-        </div>
-      </div>
-    </div>
-  @endforeach
-</div>
+                    </div>
+                  @elseif($stream->profile_id == $profile->id && strpos($stream->name, "м") && (date("Y") - $stream->year_in < 3 and date("Y") - $stream->year_in > 0) && $stream->full_name != '' && $form=="Магистратура")
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab{{ $stream->id }}-tab" data-bs-toggle="tab" data-bs-target="#tab{{ $stream->id }}"
+                          type="button" role="tab" aria-controls="home" aria-selected="true">Скрыть</button>
+                      </li>
+                      @foreach($groups as $gr)
+                        @if ($gr->stream_id == $stream->id && $stream->full_name != '' )
+                          <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tab{{ $gr->id }}-tab" data-bs-toggle="tab" data-bs-target="#tab{{ $gr->id }}"
+                            type="button" role="tab" aria-controls="home" aria-selected="true">{{ $stream->name }}-{{ $gr->group_number }}</button>
+                          </li>
+                        @endif
+                      @endforeach
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                      <div class="tab-pane fade show" id="tab{{ $stream->id }}" role="tabpanel" aria-labelledby="tab{{ $stream->id }}-tab">
 
-<div class="accordion" id="accordionExample">
-  @foreach ($faculties as $faculty)
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faculty{{$faculty->id}}" aria-expanded="false" aria-controls="faculty{{$faculty->id}}">
-          Магистратура
-        </button>
-      </h2>
-      <div id="faculty{{$faculty->id}}" class="accordion-collapse collapse" aria-labelledby="heading{{$faculty->id}}" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          @foreach ($profiles as $profile)
-            @if ($faculty->id == $profile->faculty_id)
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="heading{{$profile->id}}">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#profile{{$profile->id}}" aria-expanded="false" aria-controls="profile{{$profile->id}}">
-                    {{$profile->name}}
-                  </button>
-                </h2>
-                <div id="profile{{$profile->id}}" class="accordion-collapse collapse" aria-labelledby="heading{{$profile->id}}" data-bs-parent="#faculty{{$faculty->id}}">
-                  <div class="accordion-body">
-                    @foreach($streams as $stream)
-                      @if ($stream->profile_id == $profile->id && strpos($stream->name, "м") && (date("Y") - $stream->year < 3 && date("Y") - $stream->year > 0) && $stream->full_name != '')
-                        <div class="accordion-item">
-                          <h2 class="accordion-header" id="heading{{$stream->id}}">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#stream{{$stream->id}}" aria-expanded="false" aria-controls="stream{{$stream->id}}">  
-                                {{$stream->name}}
-                            </button>
-                          </h2>
-                          <div id="stream{{$stream->id}}" class="accordion-collapse collapse" aria-labelledby="heading{{$stream->id}}" data-bs-parent="#profile{{$profile->id}}">
-                            <div class="accordion-body">
-                              <strong>This is the accordion body for stream {{$stream->name}}</strong>
-                            </div>
-                          </div>
-                        </div>
+                      </div>
+                    @foreach($groups as $gr)
+                    @if ($gr->stream_id == $stream->id && $stream->full_name != '')
+                      <div class="tab-pane fade show" id="tab{{ $gr->id }}" role="tabpanel" aria-labelledby="tab{{ $gr->id }}-tab">
+                        <!---->
+
+                        <body>
+                          <table class="table">
+                            <thead>
+                              <tr class="tr">
+                                <th class="th" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;">ФИО Студента  </th>
+                                <th class="th" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;">Руководитель</th>
+                                <th class="th" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;">Статус</th>
+                              </tr>
+                            </thead>
+                        <tbody>
+                          @foreach($students as $student)
+                            @if($gr->id == $student->group_id)
+                              @foreach($student_practic as $studPrac)
+                                @if ($student->id == $studPrac->student_id) <!--Условие для отбора студентов практики по группам-->
+                                  <tr class="tr">
+                                    <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">{{ $student->fio}}</strong></td>
+                                    @if(!$studPrac->teacher_id)
+                                      <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">-</strong></td>
+                                    @else
+                                      <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">
+                                        @foreach ($teacher_score as $teacherScore)
+                                          @if($teacherScore->id == $studPrac->teacher_id)
+                                            @foreach($teachers as $teacher)
+                                              @if($teacher->id == $teacherScore->teacher_id)
+                                                {{$teacher->fio}} </strong></td>
+                                              @endif
+                                            @endforeach
+                                          @endif
+                                        @endforeach
+                                    @endif
+                                    @switch($studPrac->status)
+                                      @case(0)
+                                        <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">Обрабатывается</strong></td>
+                                        @break
+                                      @case(1)
+                                        <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">Принят</strong></td>
+                                        @break
+                                      @case(2)
+                                        <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">Не принят</strong></td>
+                                        @break
+                                    @endswitch
+                                  </tr>
+                                @endif
+                              @endforeach
+                              <tr class="tr">
+                                  <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">{{ $student->fio}}</strong></td>
+                                  <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">-</strong></td>
+                                  <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">-</strong></td>
+                                </tr>
+                            @endif
+                          @endforeach
+                        </tbody>
+                      </table>
+                    </body>
+
+                        <!---->
+                        <form class="d-flex justify-content-end">
+                          <button name="download" value="{{ $gr->id }}" class="btn btn-primary" href="/sotrudniku/praktika/direktsiya/download.php?groupName={{ $stream->name }}-{{ $gr->group_number }}&groupID={{ $gr->id }}" role="button">Сформировать шаблон приказ</button>
+                        </form>
+                        <!---->
+
+                      </div>
                       @endif
                     @endforeach
-                  </div>
-                </div>
-              </div>
-            @endif
-          @endforeach
+                    </div>
+                  @endif
+                @endforeach
+              @endif
+            @endforeach
+          </div>
         </div>
-      </div>
-    </div>
+    @endforeach
   @endforeach
 </div>
-
-<div class="accordion" id="accordionExample">
-  @foreach ($faculties as $faculty)
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faculty{{$faculty->id}}" aria-expanded="false" aria-controls="faculty{{$faculty->id}}">
-          Заочка
-        </button>
-      </h2>
-      <div id="faculty{{$faculty->id}}" class="accordion-collapse collapse" aria-labelledby="heading{{$faculty->id}}" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          @foreach ($profiles as $profile)
-            @if ($faculty->id == $profile->faculty_id)
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="heading{{$profile->id}}">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#profile{{$profile->id}}" aria-expanded="false" aria-controls="profile{{$profile->id}}">
-                    {{$profile->name}}
-                  </button>
-                </h2>
-                <div id="profile{{$profile->id}}" class="accordion-collapse collapse" aria-labelledby="heading{{$profile->id}}" data-bs-parent="#faculty{{$faculty->id}}">
-                  <div class="accordion-body">
-                    @foreach($streams as $stream)
-                      @if ($stream->profile_id == $profile->id && strpos($stream->name, "з") && (date("Y") - $stream->year < 3 && date("Y") - $stream->year > 0) && $stream->full_name != '')
-                        <div class="accordion-item">
-                          <h2 class="accordion-header" id="heading{{$stream->id}}">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#stream{{$stream->id}}" aria-expanded="false" aria-controls="stream{{$stream->id}}">  
-                                {{$stream->name}}
-                            </button>
-                          </h2>
-                          <div id="stream{{$stream->id}}" class="accordion-collapse collapse" aria-labelledby="heading{{$stream->id}}" data-bs-parent="#profile{{$profile->id}}">
-                            <div class="accordion-body">
-                              <strong>This is the accordion body for stream {{$stream->name}}</strong>
-                            </div>
-                          </div>
-                        </div>
-                      @endif
-                    @endforeach
-                  </div>
-                </div>
-              </div>
-            @endif
-          @endforeach
-        </div>
-      </div>
-    </div>
-  @endforeach
-</div>
-
 
 </body>
 </html>
