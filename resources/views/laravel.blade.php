@@ -117,10 +117,10 @@
 
                         <!---->
                         <form class="d-flex justify-content-end">
-                          <button name="download" value="{{ $gr->id }}" class="btn btn-primary" href="/sotrudniku/praktika/direktsiya/download.php?groupName={{ $stream->name }}-{{ $gr->group_number }}&groupID={{ $gr->id }}" role="button">Сформировать шаблон приказ</button>
+                        <button name="download" value="{{ $gr->id }}" href="excel_php/direktsiya/download.php?{{$gr->id}}" class="btn btn-primary"  role="button" type="submit">Сформировать приказ</button>
                         </form>
                         <!---->
-
+                      </script>
                       </div>
                       @endif
                     @endforeach

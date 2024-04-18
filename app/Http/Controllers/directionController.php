@@ -24,23 +24,6 @@ class directionController extends Controller
         $student_practic = DB::table('student_practic') -> get();
 
         $formEducation = ["Бакалавриат", "Магистратура"];
-        /*$formRusArr = [];
-        $formRus = "";
-        foreach($formEducation as $form){
-            switch ($form) {
-                case "Bakalavr":
-                    $formRus = "Бакалавриат";
-                    break;
-                case "Magis":
-                    $formRus = "Магистратура";
-                    break;
-                case "Zaoch":
-                    $formRus = "Заочное обучение";
-                    break;
-            }
-        $formRusArr[] = $formRus; 
-        }
-        */
         $groups = DB::table('groups') -> get();
         $templates = DB::table('templates')->get();
         $students = DB::table('students')->get();
@@ -52,22 +35,13 @@ class directionController extends Controller
         'teachers' => $teachers, 'companies' => $companies]);
         //@if ($stream -> profile_id == $profile -> id) @if ($faculty -> id == $profile -> faculty_id)
     }
-    /*
-    public function downloadJson(){
-        $data = [
-            'name' => 'John Doe',
-            'email' => 'john.doe@example.com',
-            // Add more data as needed
-        ];
-
-        $json = json_encode($data);
-
-        return response($json)
-            ->header('Content-Type', 'application/json')
-            ->header('Content-Disposition', 'attachment; filename="data.json"');
-        
+    public function handler(Request $request)
+    {
+        if(isset($_POST["download"])){
+  
+            $name = $_POST["name"];
+        }
     }
-    */
 }
 
 
