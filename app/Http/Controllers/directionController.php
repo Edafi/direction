@@ -35,12 +35,10 @@ class directionController extends Controller
         'teachers' => $teachers, 'companies' => $companies]);
         //@if ($stream -> profile_id == $profile -> id) @if ($faculty -> id == $profile -> faculty_id)
     }
+
     public function handler(Request $request)
     {
-        if(isset($_POST["download"])){
-  
-            $name = $_POST["name"];
-        }
+        $id = $request->input('download');
     }
 }
 
