@@ -114,14 +114,14 @@
                         </tbody>
                       </table>
                     </body>
-
                         <!---->
-                        <form class="d-flex justify-content-end" method="POST" >
-                          @csrf
-                          <button name="download" value="{{ $gr->id }}" href="{{ route('testing.test', $gr->id) }}" class="btn btn-primary"  role="button" type="submit">Сформировать приказ</button>
+                        <form methond="POST" action="/?download={{$gr->id}}" class="d-flex justify-content-end">
+                          <input type="button" name="download" value="{{ $gr->id }}" class="btn btn-primary" type="submit" role="button">
+                        </form>
+                        <form method="post" action="/?download={{$gr->id}}" class="d-flex justify-content-end">
+                        <button name="download" value="{{ $gr->id }}" class="btn btn-primary" type="submit">fdsaf<button>
                         </form>
                         <!---->
-                      </script>
                       </div>
                       @endif
                     @endforeach

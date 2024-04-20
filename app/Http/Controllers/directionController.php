@@ -36,9 +36,11 @@ class directionController extends Controller
         //@if ($stream -> profile_id == $profile -> id) @if ($faculty -> id == $profile -> faculty_id)
     }
 
-    public function handler(Request $request)
+    public static function post(Request $request)
     {
-        $id = $request->input('download');
+        if($request->input("download")){
+            return 'Hello World';
+        }
     }
 }
 
