@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class directionController extends Controller
 {
-    
     public function index(){
         //////////////////////////////
         $name = 'Ya nichego ne ponimau';
@@ -39,7 +38,8 @@ class directionController extends Controller
     public static function post(Request $request)
     {
         if($request->input("download")){
-            return 'Hello World';
+            $name = $request->input("download");
+            return $name;    
         }
     }
 }

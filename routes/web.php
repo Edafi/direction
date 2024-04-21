@@ -6,6 +6,10 @@ use Illuminate\Http\Response;
 
 Route::get('/', [directionController::class, 'index']);
 
-Route::post('/direction', function (Request $request) {
-    return directionController::post($request);
+Route::post('/', [directionController::class, 'post']);
+
+/*
+Route::post('/', function (Request $request) {
+    return directionController::fn1($request);
 });
+*/

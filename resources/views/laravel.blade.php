@@ -115,11 +115,9 @@
                       </table>
                     </body>
                         <!---->
-                        <form methond="POST" action="/?download={{$gr->id}}" class="d-flex justify-content-end">
-                          <input type="button" name="download" value="{{ $gr->id }}" class="btn btn-primary" type="submit" role="button">
-                        </form>
-                        <form method="post" action="/?download={{$gr->id}}" class="d-flex justify-content-end">
-                        <button name="download" value="{{ $gr->id }}" class="btn btn-primary" type="submit">fdsaf<button>
+                        <form method="post" action="/" class="d-flex justify-content-end">
+                          @csrf
+                        <button name="download" value="{{ $gr->id }}" class="btn btn-primary" type="submit">Приказ<button>
                         </form>
                         <!---->
                       </div>
