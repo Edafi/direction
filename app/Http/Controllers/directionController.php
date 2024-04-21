@@ -6,22 +6,23 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use App\Models\Templates;
+use excel\download;
 
 class directionController extends Controller
 {
-    public function index(){
+    public static function index(){
         //////////////////////////////
         $name = 'Ya nichego ne ponimau';
         //////////////////////////////
+        $faculty_id = 5;                          //после авторизации человека из дирекции последний аргумент должен вставить id дирекции
         $faculties = DB::table('faculty')
-        -> where('id', '=', '5') -> get();        //после авторизации человека из дирекции последний аргумент должен вставить id дирекции
+        -> where('id', '=', $faculty_id) -> get();        //после авторизации человека из дирекции последний аргумент должен вставить id дирекции
         $streams = DB::table('streams')
         -> orderBy('streams.name')
         -> get();
-        dump($streams);
         $profiles = DB::table('profiles') -> get();
         $student_practic = DB::table('student_practic') -> get();
-
         $formEducation = ["Бакалавриат", "Магистратура"];
         $groups = DB::table('groups') -> get();
         $templates = DB::table('templates')->get();
@@ -37,9 +38,25 @@ class directionController extends Controller
 
     public static function post(Request $request)
     {
+        date_default_timezone_set('Asia/Irkutsk');
         if($request->input("download")){
-            $name = $request->input("download");
-            return $name;    
+            $id = $request->input("download");
+            $templatesModel = new Templates;
+            if(is_null($templatesModel->where('group_id', $id)->first())){
+                $templatesModel->group_id = (string)$id;
+                $templatesModel->name = 'Hz che tut dolzno bit';
+                $templatesModel->decanat_check = 0;
+                $templatesModel->comment = 'GOIDAAAA';
+                $templatesModel->date = date("Y-m-d") ." ". date("H:i:s");
+                $templatesModel->save();
+                
+                self::index();
+            }
+            else{
+                $templatesCurrent = $templatesModel->where('group_id', $id);
+                $templatesCurrent->update(['decanat_check' => 0, 'date' => date("Y-m-d") ." ". date("H:i:s")]);
+                self::index();
+            }
         }
     }
 }
