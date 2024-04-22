@@ -10,6 +10,7 @@ use App\Models\Templates;
 use excel\download;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Helpers\PayrollHelper;
 
 class directionController extends Controller
 {
@@ -38,36 +39,230 @@ class directionController extends Controller
         //@if ($stream -> profile_id == $profile -> id) @if ($faculty -> id == $profile -> faculty_id)
     }
 
-    public static function post(Request $request)
-    {
+
+public static function post(Request $request)
+{
+    if($request->input("download")){
+        $group_id = $request->input("download");
+        $templatesModel = new Templates;
         date_default_timezone_set('Asia/Irkutsk');
-        if($request->input("download")){
-            $id = $request->input("download");
-            $templatesModel = new Templates;
-            if(is_null($templatesModel->where('group_id', $id)->first())){
-                $templatesModel->group_id = (string)$id;
+        $group = DB::table('groups')->where('id', $group_id)->first();
+        $stream = DB::table('streams')->where('id', $group->stream_id)->first();
+        $profile = DB::table('profiles')->where('id', $stream->profile_id)->first();
+        $faculty = DB::table('faculty')->where('id', $profile->faculty_id)->first();
+        $students = DB::table('students')->where('group_id', $group_id)->get();
+        $teachers = DB::table('teachers')->where('fac_id', $faculty->id)->get();
+        $practics = DB::table('student_practic')->get();
+        $companies = DB::table('companies')->get();
+        if(is_null($templatesModel->where('group_id', $group_id)->first())){
+            $templatesModel->group_id = (string)$group_id;
+            $templatesModel->name = 'Hz che tut dolzno bit';
+            $templatesModel->decanat_check = 0;
+            $templatesModel->comment = 'GOIDAAAA';
+            $templatesModel->date = date("Y-m-d") ." ". date("H:i:s");
+            $templatesModel->save();
+
+            $spreadsheet = new Spreadsheet();
+            $active = $spreadsheet->getActiveSheet();
+            $active -> mergeCells('B1:G1');
+            $active->setCellValue('B1', 'Шаблон');
+            $active -> mergeCells('B2:G2');
+            $active->setCellValue('B2', 'проекта приказа на практику студентов'); 
+            $active->setCellValue('B3', 'Факультет');
+            $active->setCellValue('B4', 'Группа');
+            $active->setCellValue('B5', 'Направление');
+            $active->setCellValue('B6', 'Профиль');
+            $active->setCellValue('B7', 'Поток');
+            $active->setCellValue('B8', 'Вид практики');
+            $active->setCellValue('B9', 'Тип практики');
+            $active->setCellValue('B10', 'Сроки практики');
+            $active->setCellValue('C3', $faculty->name);
+            $active->setCellValue('C4', $stream->name ."-".$group->group_number);
+            $active->setCellValue('C5', $profile->name);
+            $active->setCellValue('C7', $stream->name);
+            $active->setCellValue('C8', 'производственной');
+            $active->setCellValue('C9', 'технологической (проектно-технологическая)');
+            $active->setCellValue('C10', 'с');
+            $active->setCellValue('D10', '24.06.2024');
+            $active->setCellValue('E10', 'по');
+            $active->setCellValue('F10', '21.07.2024');
+            $active->setCellValue('F4', 'Всего '.sizeof($students).' чел');
+            $active->setCellValue('G4', sizeof($students));
+            $active->setCellValue('H4', 'Код');
+            $active->setCellValue('H5', 'Курс');
+            $active->setCellValue('H7', 'Код');
+            $active->setCellValue('H8', 'Код');
+            $active->setCellValue('H9', 'Код');
+            $active->setCellValue('I3', 46);
+            $active->setCellValue('I4', 3);
+            $active->setCellValue('I7', 23547);
+            $active->setCellValue('I8', 2);
+            $active->setCellValue('I9', 517);
+            $active->setCellValue('B13', 'Выпускающая кафедра: ');
+            $active->setCellValue('A16', '№\n п/п');
+            $active->setCellValue('B16', 'Студ.ИД');
+            $active->setCellValue('C16', 'ФИО Студента');
+            $active->setCellValue('D16', 'Категория');
+            $active->setCellValue('E16', 'Наименование предприятия');
+            $active->setCellValue('F16', 'Место нахождения предприятия');
+            $active->setCellValue('G16', 'Способы проведения практик');
+            $active->setCellValue('H16', 'ФИО руководителя полностью в вин. падеже(назначить кого)');
+            $active->setCellValue('I16', 'Должность руководителя в вин. падеже (назначить кого)');
+            $active->setCellValue('J16', '3-сторон. дог.');
+            $active->setCellValue('K16', 'Работа по профилю');
+            $count = 1;
+            foreach($students as $student){
+                $active->setCellValue('A'.$count+16, $count);
+                $active->setCellValue('B'.$count+16, $student->id);
+                $active->setCellValue('C'.$count+16, $student->fio);
+                $active->setCellValue('D'.$count+16, 'Общий');
+                foreach($practics as $practic){
+                    if($practic->student_id == $student->id){
+                        foreach($companies as $company){
+                            if($company->id == $practic->company_id){
+                                $active->setCellValue('E'.$count+16, $company->name);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                foreach($practics as $practic){
+                    foreach($teachers as $teacher){
+                            if($practic->teacher_id == $teacher->id){
+                                $active->setCellValue('H'.$count+16, $teacher->fio);
+                                break 2;
+                            }
+                    }
+                }
+                foreach($practics as $practic){
+                    foreach($teachers as $teacher){
+                            if($practic->teacher_id == $teacher->id){
+                                $active->setCellValue('I'.$count+16, $teacher->post);
+                                break 2;
+                            }
+                    }
+                }
+                //$active->setCellValue('H'.$count+16, function(){
+                //}); 
+                $count++;
+            }
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('hello world.xlsx');
+
+
+            self::index();
+            }
+            else{
+                $group_id = $request->input("download");
+                $templatesModel = new Templates;
+                date_default_timezone_set('Asia/Irkutsk');
+                $group = DB::table('groups')->where('id', $group_id)->first();
+                $stream = DB::table('streams')->where('id', $group->stream_id)->first();
+                $profile = DB::table('profiles')->where('id', $stream->profile_id)->first();
+                $faculty = DB::table('faculty')->where('id', $profile->faculty_id)->first();
+                $students = DB::table('students')->where('group_id', $group_id)->get();
+                $teachers = DB::table('teachers')->where('fac_id', $faculty->id)->get();
+                $practics = DB::table('student_practic')->get();
+                $companies = DB::table('companies')->get();
+                $templatesModel->group_id = (string)$group_id;
                 $templatesModel->name = 'Hz che tut dolzno bit';
                 $templatesModel->decanat_check = 0;
                 $templatesModel->comment = 'GOIDAAAA';
                 $templatesModel->date = date("Y-m-d") ." ". date("H:i:s");
                 $templatesModel->save();
+
                 $spreadsheet = new Spreadsheet();
-                $activeWorksheet = $spreadsheet->getActiveSheet();
-                $activeWorksheet->setCellValue('A1', 'Hello World !');
+                $active = $spreadsheet->getActiveSheet();
+                $active -> mergeCells('B1:G1');
+                $active->setCellValue('B1', 'Шаблон');
+                $active -> mergeCells('B2:G2');
+                $active->setCellValue('B2', 'проекта приказа на практику студентов'); 
+                $active->setCellValue('B3', 'Факультет');
+                $active->setCellValue('B4', 'Группа');
+                $active->setCellValue('B5', 'Направление');
+                $active->setCellValue('B6', 'Профиль');
+                $active->setCellValue('B7', 'Поток');
+                $active->setCellValue('B8', 'Вид практики');
+                $active->setCellValue('B9', 'Тип практики');
+                $active->setCellValue('B10', 'Сроки практики');
+                $active->setCellValue('C3', $faculty->name);
+                $active->setCellValue('C4', $stream->name ."-".$group->group_number);
+                $active->setCellValue('C5', $profile->name);
+                $active->setCellValue('C7', $stream->name);
+                $active->setCellValue('C8', 'производственной');
+                $active->setCellValue('C9', 'технологической (проектно-технологическая)');
+                $active->setCellValue('C10', 'с');
+                $active->setCellValue('D10', '24.06.2024');
+                $active->setCellValue('E10', 'по');
+                $active->setCellValue('F10', '21.07.2024');
+                $active->setCellValue('F4', 'Всего '.sizeof($students).' чел');
+                $active->setCellValue('G4', sizeof($students));
+                $active->setCellValue('H4', 'Код');
+                $active->setCellValue('H5', 'Курс');
+                $active->setCellValue('H7', 'Код');
+                $active->setCellValue('H8', 'Код');
+                $active->setCellValue('H9', 'Код');
+                $active->setCellValue('I3', 46);
+                $active->setCellValue('I4', 3);
+                $active->setCellValue('I7', 23547);
+                $active->setCellValue('I8', 2);
+                $active->setCellValue('I9', 517);
+                $active->setCellValue('B13', 'Выпускающая кафедра: ');
+                $active->setCellValue('A16', '№\n п/п');
+                $active->setCellValue('B16', 'Студ.ИД');
+                $active->setCellValue('C16', 'ФИО Студента');
+                $active->setCellValue('D16', 'Категория');
+                $active->setCellValue('E16', 'Наименование предприятия');
+                $active->setCellValue('F16', 'Место нахождения предприятия');
+                $active->setCellValue('G16', 'Способы проведения практик');
+                $active->setCellValue('H16', 'ФИО руководителя полностью в вин. падеже(назначить кого)');
+                $active->setCellValue('I16', 'Должность руководителя в вин. падеже (назначить кого)');
+                $active->setCellValue('J16', '3-сторон. дог.');
+                $active->setCellValue('K16', 'Работа по профилю');
+                $count = 1;
+                foreach($students as $student){
+                    $active->setCellValue('A' . $count+16, $count);
+                    $active->setCellValue('B' . $count+16, $student->id);
+                    $active->setCellValue('C' . $count+16, $student->fio);
+                    $active->setCellValue('D' . $count+16, 'Общий');
+                    foreach($practics as $practic){
+                        if($practic->student_id == $student->id){
+                            foreach($companies as $company){
+                                if($company->id == $practic->company_id){
+                                    $active->setCellValue('E' . $count+16, $company->name);
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    foreach($practics as $practic){
+                        foreach($teachers as $teacher){
+                            if($practic->teacher_id == $teacher->id){
+                                $active->setCellValue('H' . $count+16, $teacher->fio);
+                                break 2;
+                            }
+                        }
+                    }
+
+                    foreach($practics as $practic){
+                        foreach($teachers as $teacher){
+                            if($practic->teacher_id == $teacher->id){
+                                $active->setCellValue('I' . $count+16, $teacher->post);
+                                break 2;
+                            }
+                        }
+                    }
+                    //$active->setCellValue('H'.$count+16, function(){
+
+                    //}); 
+                    $count++;
+                }
                 $writer = new Xlsx($spreadsheet);
                 $writer->save('hello world.xlsx');
-                self::index();
             }
-            else{
-                $templatesCurrent = $templatesModel->where('group_id', $id);
-                $templatesCurrent->update(['decanat_check' => 0, 'date' => date("Y-m-d") ." ". date("H:i:s")]);
-                $spreadsheet = new Spreadsheet();
-                $activeWorksheet = $spreadsheet->getActiveSheet();
-                $activeWorksheet->setCellValue('A1', 'Hello World !');            
-                $writer = new Xlsx($spreadsheet);
-                $writer->save('hello world.xlsx');
-                self::index();
-            }
+            self::index();
         }
     }
 }
