@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Models\Templates;
 use excel\download;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class directionController extends Controller
 {
@@ -49,12 +51,21 @@ class directionController extends Controller
                 $templatesModel->comment = 'GOIDAAAA';
                 $templatesModel->date = date("Y-m-d") ." ". date("H:i:s");
                 $templatesModel->save();
-                
+                $spreadsheet = new Spreadsheet();
+                $activeWorksheet = $spreadsheet->getActiveSheet();
+                $activeWorksheet->setCellValue('A1', 'Hello World !');
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('hello world.xlsx');
                 self::index();
             }
             else{
                 $templatesCurrent = $templatesModel->where('group_id', $id);
                 $templatesCurrent->update(['decanat_check' => 0, 'date' => date("Y-m-d") ." ". date("H:i:s")]);
+                $spreadsheet = new Spreadsheet();
+                $activeWorksheet = $spreadsheet->getActiveSheet();
+                $activeWorksheet->setCellValue('A1', 'Hello World !');            
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('hello world.xlsx');
                 self::index();
             }
         }
