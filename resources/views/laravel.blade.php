@@ -72,8 +72,10 @@
                         <tbody>
                           @foreach($students as $student)
                             @if($gr->id == $student->group_id)
+                              @php($studentIn = false)
                               @foreach($student_practic as $studPrac)
                                 @if ($student->id == $studPrac->student_id) <!--Условие для отбора студентов практики по группам-->
+                                  @php ($studentIn = true)
                                   <tr class="tr">
                                     <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">{{ $student->fio}}</strong></td>
                                     @if(!$studPrac->teacher_id)
@@ -104,11 +106,13 @@
                                   </tr>
                                 @endif
                               @endforeach
-                              <tr class="tr">
+                              @if($studentIn == false)
+                                <tr class="tr">
                                   <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">{{ $student->fio}}</strong></td>
                                   <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">-</strong></td>
                                   <td class="td" style="width: 100px; font-family: Helvetica Neue OTS, sans-serif; text-align: center; vertical-align: middle;"><strong class="strong">-</strong></td>
                                 </tr>
+                                @endif
                             @endif
                           @endforeach
                         </tbody>
